@@ -4,7 +4,7 @@ import struct
 
 def decoder():
     file = open(r'C:\Users\MSI\Desktop\LPC10\2bity.txt', 'r', encoding='utf-8')
-    mowa = []
+    sound = []
     length = 1819
     nbits = 2
     a_format = 4
@@ -26,16 +26,18 @@ def decoder():
             a[i] = b[i+2][0]
         quant = decode(line[a_format*12:],nbits)
         dequant = dequantization(emin,emax,quant,nbits)
-        wyjscie = syntesize(dequant,a)
-        mowa.extend(wyjscie)
+        y = syntesize(dequant,a)
+        sound.extend(y)
     file.close()
-    sf.write('mowa_zsyntezowana4.wav',mowa,8000)
+    sf.write('mowa_zsyntezowana4.wav',sound,8000)
+
+
 def decode(data,nbits):
     quantized = []
     for d in data:
-        probka = format(ord(d), '#010b')
+        sample = format(ord(d), '#010b')
         for i in range(int(8/nbits)):
-            quantized.append(int(probka[i*2+2:(i+1)*2+2],2))
+            quantized.append(int(sample[i*2+2:(i+1)*2+2],2))
     return quantized
 
 
@@ -46,16 +48,17 @@ def dequantization(emin,emax,quant,bits):
         dequant.append(emin + delta/2 + delta*q)
     return dequant
 
+
 def syntesize(e,a):
     bs = np.zeros((10,1))
-    wyjscie = []
+    y = []
     for i in range(len(e)):
         suma = 0
         for j in range(len(a)):
             suma = suma + a[j]*bs[j]
         out = e[i] -suma
-        wyjscie.append(out)
+        y.append(out)
         bs = np.concatenate((np.array([out]),bs[:len(bs)-1]))
-    return wyjscie
+    return y
 
 decoder()
