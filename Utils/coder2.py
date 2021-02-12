@@ -124,7 +124,7 @@ def stream(emax,emin,quantized,a,bits=0):
                 buf=''
     file.close()
 if __name__=='__main__':
-    bledy=[]
+    errors_=[]
     yhat = []
     segmentated = segmentation(data)
     for i in range(1, len(segmentated)):
@@ -134,7 +134,7 @@ if __name__=='__main__':
         last10=segmentated[i-1][-10:]
         y_hat,e = errors(segmentated[i],last10,a[1:])
         quant = quantization(e,bits)
-        bledy.extend(e)
+        errors_.extend(e)
         yhat.extend(y_hat)
         stream(max(e),min(e),quant,a[1:],bits)
 
@@ -143,7 +143,7 @@ if __name__=='__main__':
     plt.subplot(312)
     plt.plot(yhat)
     plt.subplot(313)
-    plt.plot(bledy)
+    plt.plot(errors_)
     plt.show()
 
 
